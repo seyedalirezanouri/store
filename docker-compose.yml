@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres   
+    container_name: postgres_db
+    restart: "no"
+    environment:
+      POSTGRES_DB: store_database
+      POSTGRES_USER: store_user
+      POSTGRES_PASSWORD: store_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  web:
+    image: store
+    build: .
+    container_name: django-app
+    restart: "no"
+    depends_on:
+      - db
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      SECRET_KEY: "m(qeg#+@g5qmm3)!=x(xb_v6h8+z@kd6ed1e8xni&k7c7$zku8"
+      DEBUG: "1"
+      DJANGO_ALLOWED_HOSTS: "127.0.0.1,localhost"
+      DATABASE_NAME: "store_database"
+      DATABASE_USER: "store_user"
+      DATABASE_PASSWORD: "store_password"
+      DATABASE_HOST: "db"
+      DATABASE_PORT: "5432"
+    volumes:
+      - .:/app
+      # - media_volume:/app/media
+    ports:
+      - "8000:8000"
+
+volumes:
+  postgres_data:
+  # media_volume:
